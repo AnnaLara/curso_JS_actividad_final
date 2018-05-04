@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="UTF-8">
+	<title></title>
+	<style type="text/css">
+		body {
+			margin: 0;
+		}
+		#background {
+			background-color: blue;
+			width: 550px;
+			height: 385px;
+			position: relative;
+		}
+		#balon {
+			top: 20px;
+			left: 50px;
+			position: absolute;
+
+		}
+		#barra {
+			background-color: #b53333;
+			top: 320px;
+			left: 50px;
+			width: 100px;
+			height: 20px;
+			position: absolute;
+		}
+		#instrucciones {
+			padding: 5px 0 0 5px;
+		}
+	</style>
+
+
+	
+</head>
+<body>
+	<div id="background">
+		<div id="instrucciones">
+			Utiliza las siguientes teclas:<br>
+			z para moverse a la izquierda<br>
+			x para moverse a la derecha<br>
+		</div>
+		<div id="balon">
+			<img src="ball.png">
+		</div>
+		<div id="barra"></div>
+	</div>
+
+	<script type="text/javascript">
+
+		var objBalonEstilo = document.getElementById("balon").style;
+
+		var objBarraEstlo = document.getElementById("barra").style;
+
+		var estado = {
+			balonTop: 20,
+			balonLeft: 50,
+			direccionTop: 0.7,
+			direccionLeft: 0.7,
+			barraLeft: 50,
+			juegoAcabado: false,
+		};
+
+		function calcularNuevoEstado(estado) {
+			if (estado.juegoAcabado) {
+				return;
+			};
+			if (estado.balonTop > 293 && ((estado.balonLeft+15) >= estado.barraLeft) && ( (estado.balonLeft+15) <= (estado.barraLeft+100)) ) {
+				//en el if se compara estado.balonLeft+15 (el centro del borde de abajo del div rectangular) para captar el momento visual
+				// cuando el balon (la imagen es rectangular pero visualmente el balon es redondo) choca con la barra
+				estado.direccionTop = -0.7;
+			} else { 
+				if(estado.balonTop > 293) {
+				alert("El juego se ha acabado");
+				estado.juegoAcabado = true;
+				};
+			};
+			if (estado.balonLeft > 525) {
+				estado.direccionLeft = -0.7;
+			};
+			if (estado.balonTop < 0) {
+				estado.direccionTop = 0.7;
+			};
+			if (estado.balonLeft < 0) {
+				estado.direccionLeft = 0.7;
+			};
+			estado.balonTop += estado.direccionTop;
+			estado.balonLeft += estado.direccionLeft;
+
+			return estado;
+		}
+
+		function aplicarEstado(estadoActual) {
+			if (estado.juegoAcabado) {
+				return;
+			};
+			var dibujarBalon = function(estadoActual) {
+	        	objBalonEstilo.top = estadoActual.balonTop + "px";
+	        	objBalonEstilo.left = estadoActual.balonLeft + "px";
+        	}
+        	var dibujarBarra = function(estadoActual) {
+        		objBarraEstlo.left = estadoActual.barraLeft + "px";
+        	}
+        	dibujarBalon(estadoActual);
+        	dibujarBarra(estadoActual);
+		}
+
+		setInterval(function() {
+			if (estado.juegoAcabado) {
+			return;
+			};
+			estado = calcularNuevoEstado(estado);
+			aplicarEstado(estado);
+		}, 1);
+
+		
+
+		//mover barra
+
+		var caracterPulsado;
+
+
+		function manejador(elEvento) {
+			var evento = elEvento || window.event;
+			caracterPulsado = evento.charCode || evento.keyCode;
+		};
+
+		function calcularNuevoEstadoBarra(estado) {
+			if (caracterPulsado == 122 && estado.barraLeft > 0) {
+				estado.barraLeft -= 20;
+			} else {
+				if (caracterPulsado == 120 && estado.barraLeft < 450) {
+					estado.barraLeft += 20;
+				}
+			}
+			return estado;
+		};
+		
+
+		document.onkeypress = function(elEvento) {
+			if (estado.juegoAcabado) {
+				return;
+			};
+			manejador(elEvento); 
+			estado = calcularNuevoEstadoBarra(estado);
+		}
+		
+	</script>
+
+</body>
+</html>
